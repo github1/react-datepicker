@@ -246,6 +246,7 @@ describe('DatePicker', () => {
     var datePicker = TestUtils.renderIntoDocument(
       <DatePicker selected={m}
           onChange={callback}
+          inline={opts.inline}
           excludeDates={opts.excludeDates}
           filterDate={opts.filterDate}/>
     )
@@ -326,6 +327,26 @@ describe('DatePicker', () => {
       TestUtils.Simulate.keyDown(data.nodeInput, {key: 'Enter', keyCode: 13, which: 13})
       expect(data.callback.calledOnce).to.be.false
     })
+  })
+  it('should reset the keyboard selection when closed', () => {
+    var data = getOnInputKeyDownStuff()
+    TestUtils.Simulate.keyDown(data.nodeInput, {key: 'ArrowLeft', keyCode: 37, which: 37})
+    data.datePicker.setOpen(false)
+    expect(data.datePicker.state.preSelection.format(data.testFormat)).to.equal(data.copyM.format(data.testFormat))
+  })
+  it('should retain the keyboard selection when already open', () => {
+    var data = getOnInputKeyDownStuff()
+    TestUtils.Simulate.keyDown(data.nodeInput, {key: 'ArrowLeft', keyCode: 37, which: 37})
+    data.datePicker.setOpen(true)
+    data.copyM.subtract(1, 'days')
+    expect(data.datePicker.state.preSelection.format(data.testFormat)).to.equal(data.copyM.format(data.testFormat))
+  })
+  it('should open the calendar when an arrow key is pressed', () => {
+    var data = getOnInputKeyDownStuff()
+    data.datePicker.setOpen(false)
+    expect(data.datePicker.state.open).to.be.false
+    TestUtils.Simulate.keyDown(data.nodeInput, {key: 'ArrowLeft', keyCode: 37, which: 37})
+    expect(data.datePicker.state.open).to.be.true
   })
   it('should autofocus the input given the autoFocus prop', () => {
     var div = document.createElement('div')
